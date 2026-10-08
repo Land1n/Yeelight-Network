@@ -25,16 +25,18 @@ def main() -> None:
     app = create_app(YeelightController(addresses), api_token=token)
     port = int(os.getenv("YEELIGHT_PORT", "8000"))
     if host in {"0.0.0.0", "::"}:
-        lan_ip = _lan_ipv4()
-        if lan_ip:
-            print(f"Phone app server address: http://{lan_ip}:{port}")
+        addresses = _lan_ipv4()
+        if addresses:
+            print("Phone app server address candidates (use one on the same Wi-Fi/LAN):")
+            for address in addresses:
+                print(f"  http://{address}:{port}")
         else:
             print(f"Server listens on all interfaces at port {port}.")
         print("Enter this address and YEELIGHT_API_TOKEN in the Flet app.")
     uvicorn.run(app, host=host, port=port)
 
 
-def _lan_ipv4() -> str | None:
+def _lan_ipv4() -> list[str]:
     if os.name == "nt":
         command = (
             "$physical = Get-NetAdapter -Physical | "
@@ -52,10 +54,15 @@ def _lan_ipv4() -> str | None:
                 text=True,
                 timeout=10,
             )
-            for line in result.stdout.splitlines():
-                address = line.strip()
-                if address and not address.startswith("127."):
-                    return address
+            addresses = list(
+                dict.fromkeys(
+                    address
+                    for line in result.stdout.splitlines()
+                    if (address := line.strip()) and not address.startswith("127.")
+                )
+            )
+            if addresses:
+                return addresses
         except (OSError, subprocess.SubprocessError):
             pass
 
@@ -63,9 +70,9 @@ def _lan_ipv4() -> str | None:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
             probe.connect(("192.0.2.1", 80))
             address = probe.getsockname()[0]
-            return address if not address.startswith("127.") else None
+            return [address] if not address.startswith("127.") else []
     except OSError:
-        return None
+        return []
 
 
 if __name__ == "__main__":
