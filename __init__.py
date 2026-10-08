@@ -1,2 +1,1 @@
-"""HTTP API for remote Yeelight control."""
-
+"""HTTP API для удалённого управления Yeelight."""
