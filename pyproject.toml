@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yeelight-network"
+version = "0.1.0"
+description = "HTTP API for Yeelight LAN control"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110,<1",
+    "uvicorn[standard]>=0.29,<1",
+    "Yeelight-Logic @ git+https://github.com/Land1n/Yeelight-Logic.git",
+]
+
+[tool.setuptools]
+packages = ["yeelight_network"]
+package-dir = { yeelight_network = "." }
