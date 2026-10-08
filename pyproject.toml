@@ -9,6 +9,7 @@ description = "HTTP API for Yeelight LAN control"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.110,<1",
+    "python-dotenv>=1.0,<2",
     "uvicorn[standard]>=0.29,<1",
     "Yeelight-Logic @ git+https://github.com/Land1n/Yeelight-Logic.git",
 ]
